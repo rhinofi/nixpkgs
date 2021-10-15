@@ -97,7 +97,7 @@ self: super: builtins.intersectAttrs super {
   hercules-ci-agent = disableLibraryProfiling super.hercules-ci-agent;
 
   # avoid compiling twice by providing executable as a separate output (with small closure size)
-  niv = enableSeparateBinOutput super.niv;
+  niv = super.niv;
   ormolu = enableSeparateBinOutput super.ormolu;
   ghcid = enableSeparateBinOutput super.ghcid;
 
