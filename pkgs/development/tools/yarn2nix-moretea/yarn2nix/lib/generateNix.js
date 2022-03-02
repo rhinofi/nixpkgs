@@ -40,6 +40,10 @@ function prefetchgit(url, rev) {
   ).sha256
 }
 
+function isGitRev(hash) { return /^[0-9a-f]{7,40}$/i.test(hash) }
+
+function needsAllRefs(branch, rev) { return branch === rev && isGitRev(rev) }
+
 function fetchgit(fileName, url, rev, branch, builtinFetchGit) {
   return `    {
     name = "${fileName}";
@@ -49,9 +53,7 @@ function fetchgit(fileName, url, rev, branch, builtinFetchGit) {
           url = "${url}";
           ref = "${branch}";
           rev = "${rev}";
-        } // (if builtins.substring 0 3 builtins.nixVersion == "2.4" then {
-          allRefs = true;
-        } else {}));
+        }${needsAllRefs(branch, rev) ? ' // (if builtins.compareVersions builtins.nixVersion "2.4" >= 0 then { allRefs = true; } else {})' : ''});
       ` : `
         repo = fetchgit {
           url = "${url}";
