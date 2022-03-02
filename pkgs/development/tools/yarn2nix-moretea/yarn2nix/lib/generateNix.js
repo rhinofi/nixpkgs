@@ -40,6 +40,10 @@ function prefetchgit(url, rev) {
   ).sha256
 }
 
+function isGitRev(hash) { return /^[0-9a-f]{7,40}$/i.test(hash) }
+
+function needsAllRefs(branch, rev) { return branch === rev && isGitRev(rev) }
+
 function fetchgit(fileName, url, rev, branch, builtinFetchGit) {
   return `    {
     name = "${fileName}";
@@ -49,10 +53,7 @@ function fetchgit(fileName, url, rev, branch, builtinFetchGit) {
           url = "${url}";
           ref = "${branch}";
           rev = "${rev}";
-        } // (if builtins.compareVersions "2.4pre" builtins.nixVersion < 0 then {
-          # workaround for https://github.com/NixOS/nix/issues/5128
-          allRefs = true;
-        } else {}));
+        }${needsAllRefs(branch, rev) ? ' // (if builtins.compareVersions builtins.nixVersion "2.4pre" >= 0 then { allRefs = true; } else {})' : ''});
       ` : `
         repo = fetchgit {
           url = "${url}";
