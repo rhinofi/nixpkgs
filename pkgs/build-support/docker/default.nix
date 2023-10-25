@@ -925,6 +925,7 @@ rec {
               ${optionalString (!enableFakechroot) ''cd old_out''}
               eval "$fakeRootCommands"
               tar \
+                --exclude proc \
                 --sort name \
                 --numeric-owner --mtime "@$SOURCE_DATE_EPOCH" \
                 --hard-dereference \
